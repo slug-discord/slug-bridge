@@ -1,0 +1,43 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      - name: Build shadow jar
+        run: gradle shadowJar --no-daemon
+
+      - name: Rename jar with tag
+        run: |
+          mv build/libs/slug-bridge.jar "build/libs/slug-bridge-${GITHUB_REF_NAME}.jar"
+          cp "build/libs/slug-bridge-${GITHUB_REF_NAME}.jar" build/libs/slug-bridge.jar
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/libs/slug-bridge-*.jar
+            build/libs/slug-bridge.jar
+          generate_release_notes: true
+          body: |
+            Drop `slug-bridge.jar` into your Minecraft server's `plugins/` folder,
+            then fill in `plugins/SlugBridge/config.yml` with the URL + token your
+            bot gave you. Full install and protocol docs in the repo.

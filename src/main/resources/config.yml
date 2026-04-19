@@ -1,0 +1,14 @@
+# Get the url and token from your bot and paste them below.
+url: "ws://your-bot-host:9000/mc/bridge"
+token: ""
+
+events:
+  chat: true
+  joins: true
+  deaths: true
+  console: false
+
+# backoff in seconds. set initial to 0 to stop reconnecting.
+reconnect:
+  initial: 2
+  max: 60
